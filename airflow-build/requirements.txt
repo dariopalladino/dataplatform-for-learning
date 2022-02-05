@@ -1,0 +1,6 @@
+celery
+kombu
+tornado
+werkzeug
+pyspark
+SQLAlchemy

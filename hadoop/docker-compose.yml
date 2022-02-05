@@ -1,0 +1,154 @@
+version: "3"
+
+services:
+  namenode:
+    image: dariopad/hadoop-namenode:latest
+    container_name: namenode
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - 9870:9870
+      - 9000:9000
+    volumes:
+      - ../data/hadoop/dfs/namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: dariopad/hadoop-datanode:latest
+    container_name: datanode
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - 9864:9864
+    volumes:
+      - ../data/hadoop/dfs/datanode:/hadoop/dfs/data
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+  
+  resourcemanager:
+    image: dariopad/hadoop-resourcemanager:latest
+    container_name: resourcemanager
+    restart: unless-stopped
+    networks:
+      - iotnet
+    # ports:
+    #   - 9088:8088
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager:
+    image: dariopad/hadoop-nodemanager:latest
+    container_name: nodemanager
+    restart: unless-stopped
+    networks:
+      - iotnet
+    # ports:
+    #   - 8042:8042
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+  
+  historyserver:
+    image: dariopad/hadoop-historyserver:latest
+    container_name: historyserver
+    restart: unless-stopped
+    networks:
+      - iotnet
+    # ports:
+    #   - 8188:8188
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    volumes:
+      - ../data/hadoop/yarn/timeline:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+
+  hive-server:
+    image: dariopad/hive:latest
+    container_name: hive-server
+    hostname: hive-server
+    restart: unless-stopped
+    networks:
+      - iotnet
+    env_file:
+      - ./hive/hadoop-hive.env
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    ports:
+      - "10000:10000"
+
+  hive-metastore:
+    image: dariopad/hive:latest
+    container_name: hive-metastore
+    hostname: hive-metastore
+    restart: unless-stopped
+    networks:
+      - iotnet
+    env_file:
+      - ./hive/hadoop-hive.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 hivepostgres:5432"
+    ports:
+      - "9083:9083"
+
+  hive-postgres:
+    image: bitnami/postgresql:latest
+    container_name: hivepostgres
+    hostname: hivepostgres
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'hivemetastore_data:/bitnami/postgresql'
+      - './postgres-metastore/config:/hive'
+    environment:
+      - POSTGRESQL_INITSCRIPTS_DIR=/hive
+      - POSTGRESQL_PASSWORD=hivepwd
+      - POSTGRESQL_DATABASE=metastore
+      - POSTGRESQL_USERNAME=hiveuser
+
+  # hive-postgres:
+  #   image: dariopad/postgres-metastore:latest
+  #   container_name: hivepostgres
+  #   hostname: hivepostgres
+  #   restart: unless-stopped
+  #   networks:
+  #     - iotnet
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - 'hivemetastore_data:/bitnami/postgresql'
+  #   environment:
+  #     - POSTGRESQL_PREINITSCRIPTS_DIR=/docker-entrypoint-initdb.d/
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #     - METASTORE_PWD=hivepwd
+  #     - METASTORE_DB=metastore
+  #     - METASTORE_USER=hiveuser
+  #     # - POSTGRESQL_PASSWORD=adminpwd
+
+volumes:
+  hivemetastore_data:
+    driver: local
+
+networks:
+  iotnet:
+    external: true
+    name: iot_net

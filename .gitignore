@@ -1,0 +1,12 @@
+data/hadoop/dfs/datanode/*
+data/hadoop/dfs/namenode/*
+data/hadoop/postgres/+
+data/hadoop/yarn/*
+data/jupyter/notebooks/*
+data/spark/jobs/*
+data/spark/resources/data/*
+data/spark/resources/jars/*
+data/kafka/config/*
+data/kafka/data/*
+data/kafka/zookeeper/*
+data/airflow/*

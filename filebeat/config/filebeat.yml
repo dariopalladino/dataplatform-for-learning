@@ -1,0 +1,13 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /usr/share/filebeat/data/*.csv
+
+output.elasticsearch:
+  hosts: ["http://${HOST}"]
+  username: elastic
+  password: "${ELASTIC_PASSWORD}"
+  indices:
+    - index: "ingestion-index"
+  pipeline: ingestion-pipeline
