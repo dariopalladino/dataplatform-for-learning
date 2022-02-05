@@ -1,7 +1,6 @@
 FROM debian:9
 
-LABEL maintainer Ivan Ermilov <ivan.s.ermilov@gmail.com>
-LABEL maintainer Giannis Mouchakis <gmouchakis@iit.demokritos.gr>
+LABEL maintainer="Dario Palladino <dariopalladino@protonmail.com>"
 
 ARG ARG_HADOOP_VERSION
 

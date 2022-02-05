@@ -5,7 +5,7 @@ However, a small disclaimer: Building a data platform can be done in multiple di
 
 I could have used Apache Iceberg for instance instead of DeltaLake, however I need to work with Delta and there you go! Thus, I've chosen those tools I need the most based on my working experience. 
 
-## I've crafted and containerized for you the following capabilities and all working together:
+## Following capabilities are crafted and containerized for working together:
 - Streaming (based on the official containers from both bitnami aka VMWare and Confluent Inc.)
 - Streaming monitoring (based on a couple of tools, pick your preferred one)
 - The full Elasticsearch stack with Kibana, Logstash and Filebeat! (directly from the official images by Elasticsearch)

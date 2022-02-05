@@ -42,8 +42,7 @@ push:
 	docker push $(docker_user)/hadoop-resourcemanager:$(hadoop_branch)
 	docker push $(docker_user)/hadoop-nodemanager:$(hadoop_branch)
 	docker push $(docker_user)/hadoop-historyserver:$(hadoop_branch)
-	docker push $(docker_user)/hive:$(hadoop_branch)
-	docker push $(docker_user)/postgres-metastore:$(hadoop_branch)
+	docker push $(docker_user)/hive:$(hadoop_branch)	
 	docker push $(docker_user)/spark:$(spark_branch)
 	docker push $(docker_user)/jupyter-spark:$(spark_branch)
 
