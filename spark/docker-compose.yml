@@ -96,6 +96,26 @@ services:
     depends_on:
       - sparkmaster
 
+  jupyter-spark:
+    image: dariopad/jupyter-pyspark:spark-3.2.0-snapshot
+    container_name: jupyter
+    hostname: jupyter
+    restart: unless-stopped
+    networks:
+        - iotnet
+    ports:
+      - "8888:8888"
+      - "4040-4080:4040-4080"
+    volumes:
+      - ../data/jupyter/notebooks:/opt/jupyter/notebooks/
+      - ../data/spark/resources/data:/opt/jupyter/data/
+      - ../data/spark/resources/jars:/opt/jupyter/jars/
+    depends_on:
+      # - airflow
+      - sparkmaster
+      - sparkworker-1
+      - sparkworker-2
+
 networks:
   iotnet:
     external: true

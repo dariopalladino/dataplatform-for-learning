@@ -19,7 +19,7 @@ RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "gosu" "1.14.0-0"
 RUN groupadd -r sparkg && useradd --no-log-init -r -g sparkg spark && chmod g+rwX /opt/bitnami
 
 COPY rootfs /
-RUN /opt/bitnami/scripts/spark/postunpack.sh && /opt/bitnami/scripts/java/postunpack.sh && pip install --yes delta-spark
+RUN /opt/bitnami/scripts/spark/postunpack.sh && /opt/bitnami/scripts/java/postunpack.sh && pip install delta-spark
 ENV BITNAMI_APP_NAME="spark" \
     BITNAMI_IMAGE_VERSION="3.2.0-debian-10-r64" \
     JAVA_HOME="/opt/bitnami/java" \

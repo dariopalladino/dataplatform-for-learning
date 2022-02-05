@@ -49,4 +49,4 @@ EXPOSE 10000
 EXPOSE 10002
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD startup.sh
+CMD ["startup.sh"]

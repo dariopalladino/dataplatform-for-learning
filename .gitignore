@@ -1,4 +1,4 @@
-temp/*
+temp/
 data/hadoop/dfs/datanode/*
 data/hadoop/dfs/namenode/*
 data/hadoop/postgres/*
