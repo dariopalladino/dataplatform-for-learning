@@ -1,6 +1,6 @@
 FROM bitnami/postgresql:latest
 
-LABEL maintainer Dario Palladino <dario.palladino@gmail.com>
+LABEL maintainer="Dario Palladino <dariopalladino@protonmail.com>"
 
 ARG METASTORE_USERNAME
 ARG METASTORE_PASSWORD

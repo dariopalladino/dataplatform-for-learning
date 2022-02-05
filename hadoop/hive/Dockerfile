@@ -1,6 +1,6 @@
 FROM dariopad/hadoop-base:latest
 
-LABEL Dario Palladino <dario.palladino@gmail.com>
+LABEL maintainer="Dario Palladino <dariopalladino@protonmail.com>"
 
 # Allow buildtime config of HIVE_VERSION
 ARG HIVE_VERSION

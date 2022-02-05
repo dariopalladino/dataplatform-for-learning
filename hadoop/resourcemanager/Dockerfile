@@ -1,6 +1,6 @@
 FROM dariopad/hadoop-base:latest
 
-LABEL maintainer Dario Palladino <dario.palladino@gmail.com>
+LABEL maintainer="Dario Palladino <dariopalladino@protonmail.com>"
 
 
 ARG ARG_HADOOP_VERSION

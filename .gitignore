@@ -1,7 +1,7 @@
 temp/
 data/hadoop/dfs/datanode/*
 data/hadoop/dfs/namenode/*
-data/hadoop/postgres/+
+data/hadoop/postgres/*
 data/hadoop/yarn/*
 data/jupyter/notebooks/*
 data/spark/jobs/*
@@ -13,3 +13,4 @@ data/kafka/zookeeper/*
 data/airflow/*
 .gitignore
 .git/
+check-dataplatform*
