@@ -22,6 +22,8 @@ However, if you want to have everything running smoothly you should really have 
 ### Watch out! 
 Don't run the full stack on a small VM or on your laptop, it will start spinning and it will seem like your computer is ready to sky-rocket!!! I warned you :)
 
+Also, Security is turned off everywhere in this deployment, so remember, IT IS NOT A PRODUCTION-READY SOLUTION!!!
+
 ### Steps
 - git clone https://github.com:dariopalladino/dataplatform-for-learning.git
 - make create-repo (it creates the data folders required for persistency)
