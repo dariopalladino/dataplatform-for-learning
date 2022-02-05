@@ -2,7 +2,7 @@ version: "3"
 
 services:
   namenode:
-    image: dariopad/hadoop-namenode:latest
+    image: dariopad/hadoop-namenode:3.3.1-snapshot-1
     container_name: namenode
     restart: unless-stopped
     networks:
@@ -18,7 +18,7 @@ services:
       - ./hadoop.env
 
   datanode:
-    image: dariopad/hadoop-datanode:latest
+    image: dariopad/hadoop-datanode:3.3.1-snapshot-1
     container_name: datanode
     restart: unless-stopped
     networks:
@@ -34,7 +34,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
-    image: dariopad/hadoop-resourcemanager:latest
+    image: dariopad/hadoop-resourcemanager:3.3.1-snapshot-1
     container_name: resourcemanager
     restart: unless-stopped
     networks:
@@ -48,7 +48,7 @@ services:
       - ./hadoop.env
 
   nodemanager:
-    image: dariopad/hadoop-nodemanager:latest
+    image: dariopad/hadoop-nodemanager:3.3.1-snapshot-1
     container_name: nodemanager
     restart: unless-stopped
     networks:
@@ -62,7 +62,7 @@ services:
       - ./hadoop.env
   
   historyserver:
-    image: dariopad/hadoop-historyserver:latest
+    image: dariopad/hadoop-historyserver:3.3.1-snapshot-1
     container_name: historyserver
     restart: unless-stopped
     networks:
@@ -78,7 +78,7 @@ services:
       - ./hadoop.env
 
   hive-server:
-    image: dariopad/hive:latest
+    image: dariopad/hive:3.3.1-snapshot-1
     container_name: hive-server
     hostname: hive-server
     restart: unless-stopped
@@ -93,7 +93,7 @@ services:
       - "10000:10000"
 
   hive-metastore:
-    image: dariopad/hive:latest
+    image: dariopad/hive:3.3.1-snapshot-1
     container_name: hive-metastore
     hostname: hive-metastore
     restart: unless-stopped
@@ -124,25 +124,6 @@ services:
       - POSTGRESQL_PASSWORD=hivepwd
       - POSTGRESQL_DATABASE=metastore
       - POSTGRESQL_USERNAME=hiveuser
-
-  # hive-postgres:
-  #   image: dariopad/postgres-metastore:latest
-  #   container_name: hivepostgres
-  #   hostname: hivepostgres
-  #   restart: unless-stopped
-  #   networks:
-  #     - iotnet
-  #   ports:
-  #     - '5432:5432'
-  #   volumes:
-  #     - 'hivemetastore_data:/bitnami/postgresql'
-  #   environment:
-  #     - POSTGRESQL_PREINITSCRIPTS_DIR=/docker-entrypoint-initdb.d/
-  #     - ALLOW_EMPTY_PASSWORD=yes
-  #     - METASTORE_PWD=hivepwd
-  #     - METASTORE_DB=metastore
-  #     - METASTORE_USER=hiveuser
-  #     # - POSTGRESQL_PASSWORD=adminpwd
 
 volumes:
   hivemetastore_data:

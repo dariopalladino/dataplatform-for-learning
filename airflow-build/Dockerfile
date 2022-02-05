@@ -6,7 +6,7 @@
 
 # crafted python 3.9 debian version
 FROM dariopad/python3.9-dockerenv:latest
-LABEL maintainer="Dario Palladino"
+LABEL maintainer="Dario Palladino <dariopalladino@protonmail.com>"
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -28,7 +28,7 @@ ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 
-COPY dataplatform/airflow-build/requirements.txt /requirements.txt
+COPY ./airflow-build/requirements.txt /requirements.txt
 
 RUN set -ex \
     && buildDeps=' \
@@ -66,7 +66,6 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install -r requirements.txt \
     && pip install --use-feature=2020-resolver apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis>=2.10.5,<3' \
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
@@ -107,8 +106,8 @@ RUN export JAVA_HOME
 ## Finish JAVA installation
 ###############################
 
-COPY dataplatform/airflow-build/scripts/entrypoint.sh /entrypoint.sh
-COPY dataplatform/airflow-build/config/default.airflow.cfg ${AIRFLOW_HOME}/airflow/airflow.cfg
+COPY ./airflow-build/scripts/entrypoint.sh /entrypoint.sh
+COPY ./airflow-build/config/default.airflow.cfg ${AIRFLOW_HOME}/airflow/airflow.cfg
 
 ###############################
 ## SPARK files and variables
@@ -124,10 +123,9 @@ RUN echo "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${S
     mkdir -p "${SPARK_HOME}/assembly/target/scala-2.12/jars" && \
     cp -a "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}/bin/." "${SPARK_HOME}/bin/" && \
     cp -a "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}/jars/." "${SPARK_HOME}/assembly/target/scala-2.12/jars/" && \
-    rm "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
+    rm "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" && \
+    pip install -r requirements.txt && export SPARK_HOME
 
-# Create SPARK_HOME env var
-RUN export SPARK_HOME
 ENV PATH $PATH:/usr/local/spark/bin
 ###############################
 ## Finish SPARK files and variables

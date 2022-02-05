@@ -4,3 +4,4 @@ tornado
 werkzeug
 pyspark
 SQLAlchemy
+delta-spark

@@ -369,6 +369,151 @@ services:
     networks:
       - iotnet
   
+  jupyter-spark:
+    image: dariopad/jupyter-pyspark:spark-3.2.0-snapshot
+    container_name: jupyter
+    hostname: jupyter
+    restart: unless-stopped
+    networks:
+        - iotnet
+    ports:
+      - "8888:8888"
+      - "4040-4080:4040-4080"
+    volumes:
+      - ./data/jupyter/notebooks:/opt/jupyter/notebooks/
+      - ./data/spark/resources/data:/opt/jupyter/data/
+      - ./data/spark/resources/jars:/opt/jupyter/jars/
+    depends_on:
+      # - airflow
+      - sparkmaster
+      - sparkworker-1
+      - sparkworker-2
+
+  namenode:
+    image: dariopad/hadoop-namenode:3.3.1-snapshot-1
+    container_name: namenode
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - 9870:9870
+      - 9000:9000
+    volumes:
+      - ../data/hadoop/dfs/namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: dariopad/hadoop-datanode:3.3.1-snapshot-1
+    container_name: datanode
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - 9864:9864
+    volumes:
+      - ../data/hadoop/dfs/datanode:/hadoop/dfs/data
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+  
+  resourcemanager:
+    image: dariopad/hadoop-resourcemanager:3.3.1-snapshot-1
+    container_name: resourcemanager
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - 8088:8088
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager:
+    image: dariopad/hadoop-nodemanager:3.3.1-snapshot-1
+    container_name: nodemanager
+    restart: unless-stopped
+    networks:
+      - iotnet
+    # ports:
+    #   - 8042:8042
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+  
+  historyserver:
+    image: dariopad/hadoop-historyserver:3.3.1-snapshot-1
+    container_name: historyserver
+    restart: unless-stopped
+    networks:
+      - iotnet
+    # ports:
+    #   - 8188:8188
+    environment:
+      CLUSTER_NAME: "test"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    volumes:
+      - ../data/hadoop/yarn/timeline:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+
+  hive-server:
+    image: dariopad/hive:3.3.1-snapshot-1
+    container_name: hive-server
+    hostname: hive-server
+    restart: unless-stopped
+    networks:
+      - iotnet
+    env_file:
+      - ./hive/hadoop-hive.env
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    ports:
+      - "10000:10000"
+
+  hive-metastore:
+    image: dariopad/hive:3.3.1-snapshot-1
+    container_name: hive-metastore
+    hostname: hive-metastore
+    restart: unless-stopped
+    networks:
+      - iotnet
+    env_file:
+      - ./hive/hadoop-hive.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 hivepostgres:5432"
+    ports:
+      - "9083:9083"
+
+  hive-postgres:
+    image: bitnami/postgresql:latest
+    container_name: hivepostgres
+    hostname: hivepostgres
+    restart: unless-stopped
+    networks:
+      - iotnet
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'hivemetastore_data:/bitnami/postgresql'
+      - './postgres-metastore/config:/hive'
+    environment:
+      - POSTGRESQL_INITSCRIPTS_DIR=/hive
+      - POSTGRESQL_PASSWORD=hivepwd
+      - POSTGRESQL_DATABASE=metastore
+      - POSTGRESQL_USERNAME=hiveuser
+
+  
   # # not sure it's gonna work! 2b tested
   # filebeat:
   #   image: filebeat:7.7.0
@@ -411,26 +556,115 @@ services:
   #   depends_on:
   #     - elasticsearch
   #   networks:
+  #     - iotnet        
+
+  # ===> Beta test not yet fully working <====
+  # airflow-scheduler:    
+  #   image: dariopad/airflow-spark:latest
+  #   container_name: airflow-sk
+  #   hostname: airflow-sk
+  #   restart: unless-stopped
+  #   command: scheduler
+  #   environment:
+  #     - AIRFLOW_CUSTOM_CONFIG=1
+  #     - AIRFLOW_FERNET_KEY=Q-sR1UW5LYGIbG9w1XvB1N725-w66AhR_sTb2HjplaM=
+  #     - AIRFLOW_SECRET_KEY=016679103c0ee9fb0cc938a7fb994d92b3756bb13357687dfa45ac4e1a60
+  #     - AIRFLOW_DATABASE_HOST=postgresql
+  #     - AIRFLOW_DATABASE_PORT_NUMBER=5432
+  #     - AIRFLOW_DATABASE_NAME=airflow
+  #     - AIRFLOW_DATABASE_USERNAME=airflow-user
+  #     - AIRFLOW_DATABASE_PASSWORD=bitnami-pwd
+  #     - AIRFLOW_EXECUTOR=CeleryExecutor
+  #     - AIRFLOW_WEBSERVER_HOST=airflow
+  #     # - AIRFLOW_REDIS_HOST=redis://redis:6379/
+  #     # - AIRFLOW_DATABASE_PATH=db+postgresql://airflow:airflow@postgres/airflow
+  #     - AIRFLOW_REDIS_HOST=redis
+  #     - AIRFLOW_REDIS_PORT_NUMBER=6379
+  #   volumes:
+  #     - airflow_scheduler_data:/bitnami
+  #   networks:
+  #     - iotnet 
+  #   depends_on:
+  #     - airflow     
+
+  # airflow-worker:
+  #   image: dariopad/airflow-spark:latest
+  #   container_name: airflow-wk
+  #   hostname: airflow-wk
+  #   restart: unless-stopped
+  #   command: worker
+  #   environment:
+  #     - AIRFLOW_CUSTOM_CONFIG=1
+  #     - AIRFLOW_FERNET_KEY=Q-sR1UW5LYGIbG9w1XvB1N725-w66AhR_sTb2HjplaM=
+  #     - AIRFLOW_SECRET_KEY=016679103c0ee9fb0cc938a7fb994d92b3756bb13357687dfa45ac4e1a60
+  #     - AIRFLOW_DATABASE_HOST=postgresql
+  #     - AIRFLOW_DATABASE_PORT_NUMBER=5432
+  #     - AIRFLOW_DATABASE_NAME=airflow
+  #     - AIRFLOW_DATABASE_USERNAME=airflow-user
+  #     - AIRFLOW_DATABASE_PASSWORD=bitnami-pwd
+  #     - AIRFLOW_EXECUTOR=CeleryExecutor
+  #     - AIRFLOW_WEBSERVER_HOST=airflow
+  #     # - AIRFLOW_REDIS_HOST=redis://redis:6379/
+  #     # - AIRFLOW_DATABASE_PATH=db+postgresql://airflow:airflow@postgres/airflow
+  #     - AIRFLOW_REDIS_HOST=redis
+  #     - AIRFLOW_REDIS_PORT_NUMBER=6379
+  #   volumes:
+  #     - airflow_worker_data:/bitnami
+  #   networks:
   #     - iotnet      
+  #   depends_on:
+  #     - airflow
 
-  postgresql:
-    image: bitnami/postgresql:latest
-    container_name: dp-postgresql
-    hostname: dp-postgresql
-    restart: unless-stopped
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgresql_data:/bitnami/postgresql
-    environment:
-      - POSTGRESQL_DATABASE=airflow
-      - POSTGRESQL_USERNAME=airflow-user
-      - POSTGRESQL_PASSWORD=bitnami-pwd
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      - ALLOW_EMPTY_PASSWORD=yes
-    networks:
-      - iotnet      
+  # airflow:
+  #   image: dariopad/airflow-spark:latest
+  #   container_name: airflow
+  #   hostname: airflow
+  #   restart: unless-stopped
+  #   command: webserver
+  #   environment:
+  #     - LOAD_EX=n
+  #     - AIRFLOW_CUSTOM_CONFIG=1
+  #     - AIRFLOW_FERNET_KEY=Q-sR1UW5LYGIbG9w1XvB1N725-w66AhR_sTb2HjplaM=
+  #     - AIRFLOW_SECRET_KEY=016679103c0ee9fb0cc938a7fb994d92b3756bb13357687dfa45ac4e1a60
+  #     - AIRFLOW_DATABASE_HOST=postgresql
+  #     - AIRFLOW_DATABASE_PORT_NUMBER=5432
+  #     - AIRFLOW_DATABASE_NAME=airflow
+  #     - AIRFLOW_DATABASE_USERNAME=airflow-user
+  #     - AIRFLOW_DATABASE_PASSWORD=bitnami-pwd
+  #     - AIRFLOW_EXECUTOR=CeleryExecutor
+  #     - AIRFLOW_WEBSERVER_HOST=airflow
+  #     # - AIRFLOW_REDIS_HOST=redis://redis:6379/
+  #     # - AIRFLOW_DATABASE_PATH=db+postgresql://airflow:airflow@postgres/airflow
+  #     - AIRFLOW_REDIS_HOST=redis
+  #     - AIRFLOW_REDIS_PORT_NUMBER=6379
+  #   ports:
+  #     - '8088:8080'
+  #   volumes:
+  #     # - airflow_data:/bitnami
+  #     - ./data/airflow:/bitnami
+  #   networks:
+  #     - iotnet
 
+  # this instance is for airflow but we can use the same we have from hive metastore
+  # postgresql:
+  #   image: bitnami/postgresql:latest
+  #   container_name: dp-postgresql
+  #   hostname: dp-postgresql
+  #   restart: unless-stopped
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - postgresql_data:/bitnami/postgresql
+  #   environment:
+  #     - POSTGRESQL_DATABASE=airflow
+  #     - POSTGRESQL_USERNAME=airflow-user
+  #     - POSTGRESQL_PASSWORD=bitnami-pwd
+  #     # ALLOW_EMPTY_PASSWORD is recommended only for development.
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #   networks:
+  #     - iotnet   
+
+  # just needed for airflow
   redis:
     image: redis:alpine
     container_name: dp-redis
@@ -446,115 +680,7 @@ services:
     networks:
       - iotnet      
 
-  airflow-scheduler:    
-    #image: bitnami/airflow-scheduler:latest
-    image: dariopad/airflow-spark:latest
-    container_name: airflow-sk
-    hostname: airflow-sk
-    restart: unless-stopped
-    command: scheduler
-    environment:
-      - AIRFLOW_CUSTOM_CONFIG=1
-      - AIRFLOW_FERNET_KEY=Q-sR1UW5LYGIbG9w1XvB1N725-w66AhR_sTb2HjplaM=
-      - AIRFLOW_SECRET_KEY=016679103c0ee9fb0cc938a7fb994d92b3756bb13357687dfa45ac4e1a60
-      - AIRFLOW_DATABASE_HOST=postgresql
-      - AIRFLOW_DATABASE_PORT_NUMBER=5432
-      - AIRFLOW_DATABASE_NAME=airflow
-      - AIRFLOW_DATABASE_USERNAME=airflow-user
-      - AIRFLOW_DATABASE_PASSWORD=bitnami-pwd
-      - AIRFLOW_EXECUTOR=CeleryExecutor
-      - AIRFLOW_WEBSERVER_HOST=airflow
-      # - AIRFLOW_REDIS_HOST=redis://redis:6379/
-      # - AIRFLOW_DATABASE_PATH=db+postgresql://airflow:airflow@postgres/airflow
-      - AIRFLOW_REDIS_HOST=redis
-      - AIRFLOW_REDIS_PORT_NUMBER=6379
-    volumes:
-      - airflow_scheduler_data:/bitnami
-    networks:
-      - iotnet 
-    depends_on:
-      - airflow     
-
-  airflow-worker:
-    #image: bitnami/airflow-worker:latest
-    image: dariopad/airflow-spark:latest
-    container_name: airflow-wk
-    hostname: airflow-wk
-    restart: unless-stopped
-    command: worker
-    environment:
-      - AIRFLOW_CUSTOM_CONFIG=1
-      - AIRFLOW_FERNET_KEY=Q-sR1UW5LYGIbG9w1XvB1N725-w66AhR_sTb2HjplaM=
-      - AIRFLOW_SECRET_KEY=016679103c0ee9fb0cc938a7fb994d92b3756bb13357687dfa45ac4e1a60
-      - AIRFLOW_DATABASE_HOST=postgresql
-      - AIRFLOW_DATABASE_PORT_NUMBER=5432
-      - AIRFLOW_DATABASE_NAME=airflow
-      - AIRFLOW_DATABASE_USERNAME=airflow-user
-      - AIRFLOW_DATABASE_PASSWORD=bitnami-pwd
-      - AIRFLOW_EXECUTOR=CeleryExecutor
-      - AIRFLOW_WEBSERVER_HOST=airflow
-      # - AIRFLOW_REDIS_HOST=redis://redis:6379/
-      # - AIRFLOW_DATABASE_PATH=db+postgresql://airflow:airflow@postgres/airflow
-      - AIRFLOW_REDIS_HOST=redis
-      - AIRFLOW_REDIS_PORT_NUMBER=6379
-    volumes:
-      - airflow_worker_data:/bitnami
-    networks:
-      - iotnet      
-    depends_on:
-      - airflow
-
-  airflow:
-    image: dariopad/airflow-spark:latest
-    container_name: airflow
-    hostname: airflow
-    restart: unless-stopped
-    command: webserver
-    environment:
-      - LOAD_EX=n
-      - AIRFLOW_CUSTOM_CONFIG=1
-      - AIRFLOW_FERNET_KEY=Q-sR1UW5LYGIbG9w1XvB1N725-w66AhR_sTb2HjplaM=
-      - AIRFLOW_SECRET_KEY=016679103c0ee9fb0cc938a7fb994d92b3756bb13357687dfa45ac4e1a60
-      - AIRFLOW_DATABASE_HOST=postgresql
-      - AIRFLOW_DATABASE_PORT_NUMBER=5432
-      - AIRFLOW_DATABASE_NAME=airflow
-      - AIRFLOW_DATABASE_USERNAME=airflow-user
-      - AIRFLOW_DATABASE_PASSWORD=bitnami-pwd
-      - AIRFLOW_EXECUTOR=CeleryExecutor
-      - AIRFLOW_WEBSERVER_HOST=airflow
-      # - AIRFLOW_REDIS_HOST=redis://redis:6379/
-      # - AIRFLOW_DATABASE_PATH=db+postgresql://airflow:airflow@postgres/airflow
-      - AIRFLOW_REDIS_HOST=redis
-      - AIRFLOW_REDIS_PORT_NUMBER=6379
-    ports:
-      - '8088:8080'
-    volumes:
-      # - airflow_data:/bitnami
-      - ./data/airflow:/bitnami
-    networks:
-      - iotnet
-
-  jupyter-spark:
-    image: jupyter/pyspark-notebook:spark-3.2.0
-    container_name: jupyter
-    hostname: jupyter
-    restart: unless-stopped
-    networks:
-        - iotnet
-    ports:
-      - "8888:8888"
-      - "4040-4080:4040-4080"
-    volumes:
-      - ./data/jupyter/notebooks:/opt/jupyter/notebooks/
-      - ./data/spark/resources/data:/opt/jupyter/data/
-      - ./data/spark/resources/jars:/opt/jupyter/jars/
-    depends_on:
-      # - airflow
-      - sparkmaster
-      - sparkworker-1
-      - sparkworker-2
-
-volumes:
+volumes:  
   zk1_data:
     external:
       name: zk_1_data
@@ -606,6 +732,8 @@ volumes:
   logstash_config:
     external:
       name: logstash_data2
+  hivemetastore_data:
+    driver: local      
 
 networks:
   iotnet:
