@@ -3,7 +3,7 @@ Quite a nice place to start learning around all major buzzy platforms out there,
 
 However, a small disclaimer: Building a data platform can be done in multiple different ways and with a variety of different stacks. I've picked up those that I know better and are OSS licensed. 
 
-I could have used Apache Iceberg for instance instead of DeltaLake, however I need to work with Delta and there we go! Thus, I've chosen those tools I need the most based on my working experience. 
+I could have used Apache Iceberg for instance instead of DeltaLake, however I need to work with Delta and there you go! Thus, I've chosen those tools I need the most based on my working experience. 
 
 ## I've crafted and containerized for you the following capabilities and all working together:
 - Streaming (based on the official containers from both bitnami aka VMWare and Confluent Inc.)
