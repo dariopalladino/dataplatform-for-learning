@@ -163,7 +163,7 @@ services:
       - zookeeper3
 
   sparkmaster:
-    image: 'bitnami/spark:latest'
+    image: 'dariopad/spark:3.2.0-snapshot'
     container_name: sparkmaster
     hostname: sparkmaster
     restart: unless-stopped
@@ -197,7 +197,7 @@ services:
       - kafka-3
 
   sparkworker-1:
-    image: 'bitnami/spark:latest'
+    image: 'dariopad/spark:3.2.0-snapshot'
     container_name: sparkworker-1
     hostname: sparkworker-1
     restart: unless-stopped
@@ -232,7 +232,7 @@ services:
       - kafka-3
 
   sparkworker-2:
-    image: 'bitnami/spark:latest'
+    image: 'dariopad/spark:3.2.0-snapshot'
     container_name: sparkworker-2
     hostname: sparkworker-2
     restart: unless-stopped

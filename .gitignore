@@ -1,3 +1,4 @@
+temp/
 data/hadoop/dfs/datanode/*
 data/hadoop/dfs/namenode/*
 data/hadoop/postgres/+
@@ -10,3 +11,5 @@ data/kafka/config/*
 data/kafka/data/*
 data/kafka/zookeeper/*
 data/airflow/*
+.gitignore
+.git/
