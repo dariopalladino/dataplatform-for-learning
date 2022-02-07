@@ -10,4 +10,4 @@ USER root
 RUN useradd --password $(python3 -c 'import crypt; print(crypt.crypt("${CFG_PASSWORD}"))') ${CFG_USER}
 RUN pip install delta-spark
 
-USER jupyter
+USER jovyan

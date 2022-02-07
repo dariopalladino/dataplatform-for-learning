@@ -163,7 +163,7 @@ services:
       - zookeeper3
 
   sparkmaster:
-    image: 'dariopad/spark:3.2.0-snapshot-1'
+    image: 'dariopad/spark:${SPARK_BRANCH}'
     container_name: sparkmaster
     hostname: sparkmaster
     restart: unless-stopped
@@ -197,7 +197,7 @@ services:
       - kafka-3
 
   sparkworker-1:
-    image: 'dariopad/spark:3.2.0-snapshot-1'
+    image: 'dariopad/spark:${SPARK_BRANCH}'
     container_name: sparkworker-1
     hostname: sparkworker-1
     restart: unless-stopped
@@ -232,7 +232,7 @@ services:
       - kafka-3
 
   sparkworker-2:
-    image: 'dariopad/spark:3.2.0-snapshot-1'
+    image: 'dariopad/spark:${SPARK_BRANCH}'
     container_name: sparkworker-2
     hostname: sparkworker-2
     restart: unless-stopped
@@ -370,7 +370,7 @@ services:
       - iotnet
   
   jupyter-spark:
-    image: dariopad/jupyter-pyspark:spark-3.2.0-snapshot-1
+    image: 'dariopad/jupyter-spark:${SPARK_BRANCH}'
     container_name: jupyter
     hostname: jupyter
     restart: unless-stopped
