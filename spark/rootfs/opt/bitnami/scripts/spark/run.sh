@@ -9,6 +9,8 @@ set -o pipefail
 
 # Load libraries
 . /opt/bitnami/scripts/libspark.sh
+. /opt/bitnami/scripts/libsparkhive.sh
+
 . /opt/bitnami/scripts/libos.sh
 . /opt/bitnami/scripts/pydependencies.sh
 

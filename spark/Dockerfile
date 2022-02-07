@@ -19,6 +19,7 @@ RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "gosu" "1.14.0-0"
 RUN groupadd -r sparkg && useradd --no-log-init -r -g sparkg spark && chmod g+rwX /opt/bitnami
 
 COPY rootfs /
+COPY conf/hive-site.xml /opt/bitnami/spark/conf/
 RUN /opt/bitnami/scripts/spark/postunpack.sh && /opt/bitnami/scripts/java/postunpack.sh && pip install delta-spark
 ENV BITNAMI_APP_NAME="spark" \
     BITNAMI_IMAGE_VERSION="3.2.0-debian-10-r64" \
@@ -30,6 +31,7 @@ ENV BITNAMI_APP_NAME="spark" \
     SPARK_HOME="/opt/bitnami/spark"
 
 WORKDIR /opt/bitnami/spark
+# Watch out! Added to have more control on the container, however to be removed for any other env different from DEV!
 USER root
 ENTRYPOINT [ "/opt/bitnami/scripts/spark/entrypoint.sh" ]
 CMD [ "/opt/bitnami/scripts/spark/run.sh" ]
