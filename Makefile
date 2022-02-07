@@ -14,7 +14,6 @@ build:
 	docker build -t $(docker_user)/hive:$(stack_branch) ./hadoop/hive --build-arg HIVE_VERSION=3.1.2 --no-cache
 	docker build -t $(docker_user)/spark:$(stack_branch) ./spark --no-cache
 	docker build -t $(docker_user)/jupyter-spark:$(stack_branch) ./jupyter --no-cache --build-arg CFG_USER=jupyter --build-arg CFG_PASSWORD=$(jupyterpwd)
-	docker build -t $(docker_user)/airflow-spark:$(stack_branch) ./airflow-build --no-cache
 
 build-hadoop:
 	docker build -t $(docker_user)/hadoop-base:$(stack_branch) ./hadoop/base --build-arg ARG_HADOOP_VERSION=3.3.1
@@ -75,31 +74,31 @@ create-volumes:
 	docker volume create logstash_data2
 
 run:
-	SPARK_BRANCH=$(stack_branch) docker-compose -f docker-compose.yml up -d
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f docker-compose.yml up -d
 
 run-spark:
-	SPARK_BRANCH=$(stack_branch) docker-compose -f ./spark/docker-compose.yml up -d
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f ./spark/docker-compose.yml up -d
 
 run-jupyter:
-	SPARK_BRANCH=$(stack_branch) docker-compose -f ./spark/docker-compose.yml jupyter up -d
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f ./spark/docker-compose.yml jupyter up -d
 
 run-kafka:
-	docker-compose -f ./kafka/docker-compose.yml up -d
+	DOCKER_NETWORK=$(docker_network) docker-compose -f ./kafka/docker-compose.yml up -d
 
 run-hadoop:
-	docker-compose -f ./hadoop/docker-compose.yml up -d
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f ./hadoop/docker-compose.yml up -d
 
 stop:
-	docker-compose -f docker-compose.yml down
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f docker-compose.yml down
 
 stop-spark:
-	SPARK_BRANCH=$(stack_branch) docker-compose -f ./spark/docker-compose.yml down
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f ./spark/docker-compose.yml down
 
 stop-kafka:
-	docker-compose -f ./kafka/docker-compose.yml down
+	DOCKER_NETWORK=$(docker_network) docker-compose -f ./kafka/docker-compose.yml down
 
 stop-hadoop:
-	docker-compose -f ./hadoop/docker-compose.yml down
+	STACK_BRANCH=$(stack_branch) DOCKER_NETWORK=$(docker_network) docker-compose -f ./hadoop/docker-compose.yml down
 
 create-repo:
 	mkdir -p ./data/hadoop/dfs/datanode

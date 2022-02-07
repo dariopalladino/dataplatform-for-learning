@@ -2,7 +2,7 @@ version: "3"
 
 services:
   namenode:
-    image: dariopad/hadoop-namenode:3.3.1-snapshot-1
+    image: dariopad/hadoop-namenode:${STACK_BRANCH}
     container_name: namenode
     restart: unless-stopped
     networks:
@@ -18,7 +18,7 @@ services:
       - ./hadoop.env
 
   datanode:
-    image: dariopad/hadoop-datanode:3.3.1-snapshot-1
+    image: dariopad/hadoop-datanode:${STACK_BRANCH}
     container_name: datanode
     restart: unless-stopped
     networks:
@@ -34,7 +34,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
-    image: dariopad/hadoop-resourcemanager:3.3.1-snapshot-1
+    image: dariopad/hadoop-resourcemanager:${STACK_BRANCH}
     container_name: resourcemanager
     restart: unless-stopped
     networks:
@@ -48,7 +48,7 @@ services:
       - ./hadoop.env
 
   nodemanager:
-    image: dariopad/hadoop-nodemanager:3.3.1-snapshot-1
+    image: dariopad/hadoop-nodemanager:${STACK_BRANCH}
     container_name: nodemanager
     restart: unless-stopped
     networks:
@@ -62,7 +62,7 @@ services:
       - ./hadoop.env
   
   historyserver:
-    image: dariopad/hadoop-historyserver:3.3.1-snapshot-1
+    image: dariopad/hadoop-historyserver:${STACK_BRANCH}
     container_name: historyserver
     restart: unless-stopped
     networks:
@@ -78,7 +78,7 @@ services:
       - ./hadoop.env
 
   hive-server:
-    image: dariopad/hive:3.3.1-snapshot-1
+    image: dariopad/hive:${STACK_BRANCH}
     container_name: hive-server
     hostname: hive-server
     restart: unless-stopped
@@ -93,7 +93,7 @@ services:
       - "10000:10000"
 
   hive-metastore:
-    image: dariopad/hive:3.3.1-snapshot-1
+    image: dariopad/hive:${STACK_BRANCH}
     container_name: hive-metastore
     hostname: hive-metastore
     restart: unless-stopped
@@ -132,4 +132,4 @@ volumes:
 networks:
   iotnet:
     external: true
-    name: iot_net
+    name: ${DOCKER_NETWORK:-iot_net}

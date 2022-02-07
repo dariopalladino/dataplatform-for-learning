@@ -25,45 +25,44 @@ Also, Security is turned off everywhere in this deployment for ease of implement
 - git clone https://github.com:dariopalladino/dataplatform-for-learning.git
 - make create-repo (it creates the data folders required for persistency)
 - make create-volumes (it creates the external volumes to bind some working folders)
-- make create-net (it creates the network which will be bound to each container)
-- make run (it runs the whole stack)
+- make create-net DOCKER_NETWORK=iot_net (it creates the network which will be bound to each container)
+- make run DOCKER_NETWORK=iot_net STACK_BRANCH=1.0-SNAPSHOT (it runs the whole stack)
 
 #### Watch out!
-All containers run under the external network (bridge driver) iot_net. When you run the make create-net command it will create the network based on a variable set to iot_net. 
-
-However, while you can change it to anything you want, since the docker-compose.yml is not yet parametrized, remember to change the network at the bottom of this file.
+All containers run under the external network (bridge driver) iot_net. When you run the make create-net command it will create the network based on a variable set to iot_net. ($DOCKER_NETWORK=iot_net)
 
 ### To run only parts of the stack:
 #### Apache Spark with Jupyter
-- make run-spark
+- make run-spark DOCKER_NETWORK=iot_net STACK_BRANCH=1.0-SNAPSHOT
 
 #### Hadoop and Spark with Jupyter
-- make run-hadoop
-- make run-spark
+- make run-hadoop DOCKER_NETWORK=iot_net STACK_BRANCH=1.0-SNAPSHOT
+- make run-spark DOCKER_NETWORK=iot_net STACK_BRANCH=1.0-SNAPSHOT
 
 #### Only Kafka and its ecosystem
-- make run-kafka
+- make run-kafka DOCKER_NETWORK=iot_net
 
 #### Build your own image
 You may want to refactor these containers, then you can do it and rebuild them all easily with the Makefile
-- make build (it rebuilds each container)
-- make build-spark (rebuild only spark)
-- make build-jupyter (rebuild only jupyter)
-- make build-hadoop (rebuild only hadoop)
-- make build-airflow (rebuild only airflow)
+- make build STACK_BRANCH=1.0-SNAPSHOT (it rebuilds each container)
+- make build-spark STACK_BRANCH=1.0-SNAPSHOT (rebuild only spark)
+- make build-jupyter STACK_BRANCH=1.0-SNAPSHOT CFG_PASSWD=whatever (rebuild only jupyter)
+- make build-hadoop STACK_BRANCH=1.0-SNAPSHOT (rebuild only hadoop)
+- make build-airflow STACK_BRANCH=1.0-SNAPSHOT (rebuild only airflow)
 
 ## Next steps
-- Introduce KSQL for realtime analytics reading multiple source and storing perhaps on Hive tables with Hive Interactive Query (LLAP)? (hmmmm!)
+- Introduce KSQL for realtime analytics reading multiple sources and storing perhaps on Hive tables with Hive Interactive Query (LLAP)? (hmmmm!)
 - Add Apache Ranger for enabling integrated security. (Any help?)
 - Add PrestoDB as part of the SQL Engine arsenal. I love it and I want to experiment with it. 
 - Add Dremio! Dremio is a wanderful Data Reflection/Data Virtualization tool. I've experimented a bit already and I love it!
-- Add some sample code in python to show each piece of this stack through python jobs. For instance, reading continuously from WikiMedia changes and streaming to Kafka. Having another job consuming from Kafka and streaming to Elasticsearch to build indexes on specific words and monitoring the changes happening on specific pages. 
+- Add Apache Atlas for building around Data Governance and Data Lineage. Just to learn more about this powerful OSS tool!
+- Add some sample code in python to show each piece of this stack. For instance, reading continuously from WikiMedia changes and streaming to Kafka. Having another job consuming from Kafka and streaming to Elasticsearch to build indexes on specific words and monitoring the changes happening on specific pages. 
 - Another example I'm working on is StructuredStreaming, same exercise, reading from a stream of data sent by Filebeat to Kafka from a big dataset (xGB) and listening from a pySpark job which analyze the data and write the content into hadoop with a delta format.
 - From Jupyter, you can connect to Apache Spark cluster and read from hadoop with the delta format, create your tables and refresh to see new content as it comes from the streaming job.
 
-If you have DBeaver, you can connect to your store through Hive JDBC and read your tables.
+If you have DBeaver, you can connect to your store through Hive JDBC (Thrift actually) and read your tables.
 
-There you go! you have a full working data platform covering most of the business requirements. 
+There you go! you have a full "working?" data platform covering most of the common business requirements. 
 
 ## License
 This project is open-sourced software licensed under the [Apache v2.0 License](LICENSE.txt)
