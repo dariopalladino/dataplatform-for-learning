@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   sparkmaster:
-    image: 'dariopad/spark:${SPARK_BRANCH}'
+    image: 'dariopad/spark:${STACK_BRANCH}'
     container_name: sparkmaster
     hostname: sparkmaster
     restart: unless-stopped
@@ -40,7 +40,7 @@ services:
       - ../data/spark/resources:/opt/bitnami/spark/resources #Resources folder (Must be the same path in airflow and Spark Cluster)      
 
   sparkworker-1:
-    image: 'dariopad/spark:${SPARK_BRANCH}'
+    image: 'dariopad/spark:${STACK_BRANCH}'
     container_name: sparkworker-1
     hostname: sparkworker-1
     restart: unless-stopped
@@ -79,7 +79,7 @@ services:
       - sparkmaster
 
   sparkworker-2:
-    image: 'dariopad/spark:${SPARK_BRANCH}'
+    image: 'dariopad/spark:${STACK_BRANCH}'
     container_name: sparkworker-2
     hostname: sparkworker-2
     restart: unless-stopped
@@ -119,7 +119,7 @@ services:
       - sparkmaster
 
   jupyter-spark:
-    image: 'dariopad/jupyter-spark:${SPARK_BRANCH}'
+    image: 'dariopad/jupyter-spark:${STACK_BRANCH}'
     container_name: jupyter
     hostname: jupyter
     restart: unless-stopped
@@ -141,4 +141,4 @@ services:
 networks:
   iotnet:
     external: true
-    name: iot_net
+    name: ${DOCKER_NETWORK:-iot_net}

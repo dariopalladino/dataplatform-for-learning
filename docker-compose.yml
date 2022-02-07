@@ -163,7 +163,7 @@ services:
       - zookeeper3
 
   sparkmaster:
-    image: 'dariopad/spark:${SPARK_BRANCH}'
+    image: 'dariopad/spark:${STACK_BRANCH}'
     container_name: sparkmaster
     hostname: sparkmaster
     restart: unless-stopped
@@ -197,7 +197,7 @@ services:
       - kafka-3
 
   sparkworker-1:
-    image: 'dariopad/spark:${SPARK_BRANCH}'
+    image: 'dariopad/spark:${STACK_BRANCH}'
     container_name: sparkworker-1
     hostname: sparkworker-1
     restart: unless-stopped
@@ -232,7 +232,7 @@ services:
       - kafka-3
 
   sparkworker-2:
-    image: 'dariopad/spark:${SPARK_BRANCH}'
+    image: 'dariopad/spark:${STACK_BRANCH}'
     container_name: sparkworker-2
     hostname: sparkworker-2
     restart: unless-stopped
@@ -282,7 +282,7 @@ services:
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka-1:9092,kafka-2:9092,kafka-3:9092'
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8091
+      SCHEMA_REGISTRY_LISTENERS: 'http://schema-registry:8091'
 
 
   kafka-rest-proxy:
@@ -302,7 +302,7 @@ services:
     environment:
       KAFKA_REST_HOST_NAME: kafka-rest-proxy
       KAFKA_REST_BOOTSTRAP_SERVERS: 'kafka-1:9092,kafka-2:9092,kafka-3:9092'
-      KAFKA_REST_LISTENERS: "http://0.0.0.0:8092"
+      KAFKA_REST_LISTENERS: "http://kafka-rest-proxy:8092"
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8091'
 
   kafka-ui:
@@ -370,7 +370,7 @@ services:
       - iotnet
   
   jupyter-spark:
-    image: 'dariopad/jupyter-spark:${SPARK_BRANCH}'
+    image: 'dariopad/jupyter-spark:${STACK_BRANCH}'
     container_name: jupyter
     hostname: jupyter
     restart: unless-stopped
@@ -390,7 +390,7 @@ services:
       - sparkworker-2
 
   namenode:
-    image: dariopad/hadoop-namenode:3.3.1-snapshot-1
+    image: dariopad/hadoop-namenode:${STACK_BRANCH}
     container_name: namenode
     restart: unless-stopped
     networks:
@@ -406,7 +406,7 @@ services:
       - ./hadoop.env
 
   datanode:
-    image: dariopad/hadoop-datanode:3.3.1-snapshot-1
+    image: dariopad/hadoop-datanode:${STACK_BRANCH}
     container_name: datanode
     restart: unless-stopped
     networks:
@@ -422,7 +422,7 @@ services:
       - ./hadoop.env
   
   resourcemanager:
-    image: dariopad/hadoop-resourcemanager:3.3.1-snapshot-1
+    image: dariopad/hadoop-resourcemanager:${STACK_BRANCH}
     container_name: resourcemanager
     restart: unless-stopped
     networks:
@@ -436,7 +436,7 @@ services:
       - ./hadoop.env
 
   nodemanager:
-    image: dariopad/hadoop-nodemanager:3.3.1-snapshot-1
+    image: dariopad/hadoop-nodemanager:${STACK_BRANCH}
     container_name: nodemanager
     restart: unless-stopped
     networks:
@@ -450,7 +450,7 @@ services:
       - ./hadoop.env
   
   historyserver:
-    image: dariopad/hadoop-historyserver:3.3.1-snapshot-1
+    image: dariopad/hadoop-historyserver:${STACK_BRANCH}
     container_name: historyserver
     restart: unless-stopped
     networks:
@@ -466,7 +466,7 @@ services:
       - ./hadoop.env
 
   hive-server:
-    image: dariopad/hive:3.3.1-snapshot-1
+    image: dariopad/hive:${STACK_BRANCH}
     container_name: hive-server
     hostname: hive-server
     restart: unless-stopped
@@ -481,7 +481,7 @@ services:
       - "10000:10000"
 
   hive-metastore:
-    image: dariopad/hive:3.3.1-snapshot-1
+    image: dariopad/hive:${STACK_BRANCH}
     container_name: hive-metastore
     hostname: hive-metastore
     restart: unless-stopped
@@ -588,7 +588,7 @@ services:
   #     - airflow     
 
   # airflow-worker:
-  #   image: dariopad/airflow-spark:spark-3.2.0-snapshot-1
+  #   image: dariopad/airflow-spark:${STACK_BRANCH}
   #   container_name: airflow-wk
   #   hostname: airflow-wk
   #   restart: unless-stopped
@@ -616,7 +616,7 @@ services:
   #     - airflow
 
   # airflow:
-  #   image: dariopad/airflow-spark:spark-3.2.0-snapshot-1
+  #   image: dariopad/airflow-spark:${STACK_BRANCH}
   #   container_name: airflow
   #   hostname: airflow
   #   restart: unless-stopped
@@ -738,4 +738,4 @@ volumes:
 networks:
   iotnet:
     external: true
-    name: iot_net
+    name: ${DOCKER_NETWORK:-iot_net}
