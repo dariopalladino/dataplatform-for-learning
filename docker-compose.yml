@@ -678,7 +678,23 @@ services:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
       - ALLOW_EMPTY_PASSWORD=yes
     networks:
-      - iotnet      
+      - iotnet 
+
+ # Data Virtualization w/ DataReflection
+  dremio:
+    image: dremio/dremio-oss:latest
+    container_name: dremio-oss
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 31010:31010
+      - 9047:9047
+      - 45678:45678
+    volumes:
+      - dremio_data:/opt/dremio/data
+    networks:
+      - iotnet
+          
 
 volumes:  
   zk1_data:
@@ -711,6 +727,9 @@ volumes:
   redis_data:
     external:
       name: redis_fs_data
+  dremio_data:
+    external:
+      name: dremio_fs_data
   airflow_data:
     external:
       name: airflow_data

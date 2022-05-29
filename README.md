@@ -12,6 +12,7 @@ For instance, I could have used Apache Iceberg instead of DeltaLake, however bei
 - Apache Spark with DeltaLake for distributed computing if you want experience running jobs on bigdata (based on the great work made by Bitnami)
 - Jupyter with Spark and DeltaLake for learning on-the-fly by connecting to the Apache Spark cluster and using DeltaLake capabilities reading and saving from Hadoop! (based on Jupyter official image)
 - Airflow with Spark and DeltaLake (based on official images from Airflow). However, I haven't yet been able to make it fully work nor the time, but it's a good start if you want to learn and work with it.
+- Dremio Data Virtualization and DataReflection with the latest official docker image.
 
 ## How to run
 Before running, ensure you are on a good VM with at least 16VCores and 32GB RAM. I tried to keep the specs to the bare minimum and each Spark worker is just using 1GB each, however it is recommended to have more workers for better performance and if you want to have everything running smoothly you should really have a very good VM.

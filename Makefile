@@ -64,7 +64,7 @@ create-volumes:
 	docker volume create spark_w_data
 	docker volume create postgresql_data
 	docker volume create redis_fs_data
-	docker volume create redis_fs_data
+	docker volume create dremio_fs_data
 	docker volume create airflow_data
 	docker volume create airflow_w_data
 	docker volume create airflow_sk_data
